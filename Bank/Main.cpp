@@ -76,20 +76,8 @@ public:
 		int temp = (num1.num.length() - dotPos1 > num2.num.length() - dotPos2 ? num1.num.length() - dotPos1 : num2.num.length() - dotPos2);
 
 		for (int i = dotPos1; i < dotPos1 + temp; i++) {
-			char a, b;
-
-			if (i > num1.num.length() - 1) {
-				a = '0';
-				b = num2.num[i];
-			}
-			else if (i > num2.num.length() - 1) {
-				a = num1.num[i];
-				b = '0';
-			}
-			else {
-				a = num1.num[i];
-				b = num2.num[i];
-			}
+			char a = (i < num1.num.length()) ? '0' : num1.num[i];
+			char b = (i < num2.num.length()) ? '0' : num2.num[i];
 
 			if (a > b)
 				return false;
@@ -152,14 +140,18 @@ public:
 };
 
 class Headquarter : public Handler {
-
+private:
+	const Number* max = new Number("1000000000000.00"); // 1,000,000,000,000
 public:
 	Headquarter(Handler* handler) : Handler(handler) { }
 
 	~Headquarter() { }
 
 	void process(Number* amount) {
-		cout << "Headquarter Handler is processing this transfer ===> Money transfer" << endl;
+		if (*amount <= *this->max)
+			cout << "Headquarter Handler is processing this transfer ===> Money transfer" << endl;
+		else
+			cout << "No Handler have enough fund to process this transfer ===> Money not transfer" << endl;
 	}
 };
 
@@ -181,7 +173,7 @@ public:
 int main() {
 	Chain* chain = new Chain();
 
-	chain->process(new Number("1000000000.00001"));
+	chain->process(new Number("1000000000.000000001"));
 
 	return 0;
 }
