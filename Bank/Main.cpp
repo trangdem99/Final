@@ -2,6 +2,98 @@
 
 using namespace std;
 
+class Number {
+private:
+	string num;
+public:
+	Number() {
+		this->num = "0.0";
+	}
+	~Number() { }
+	Number(string num) {
+		this->num = num;
+	}
+
+	bool numCheck() {
+		if ((this->num[0] >= '0' && this->num[0] <= '9') || this->num[0] == '-' || this->num[0] == '+' || this->num[0] == '.') {
+			int dotFlag = (this->num[0] == '.' ? 1 : 0);
+
+			for (int i = 0; i < this->num.length(); i++) {
+				if (this->num[i] == '.')
+					if (dotFlag == 0)
+						dotFlag == 1;
+					else
+						return false;
+				else if (this->num[0] < '0' || this->num[0] > '9')
+					return false;
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	friend bool operator>=(const Number& num1, const Number& num2) {
+		if (num1.num[0] == '+' && num2.num[0] == '-')
+			return true;
+		else if (num1.num[0] == '-' && num2.num[0] == '+')
+			return false;
+		else {
+			int dotPos1 = 0, dotPos2 = 0;
+
+			for (int i = 0; i < num1.num.length(); i++)
+				if (num1.num[i] == '.') {
+					dotPos1 = i; 
+					break;
+				}
+
+			for (int i = 0; i < num2.num.length(); i++)
+				if (num2.num[i] == '.') {
+					dotPos2 = i;
+					break;
+				}
+
+			if (dotPos1 > dotPos2)
+				return true;
+			else if (dotPos1 < dotPos2)
+				return false;
+			
+			for (int i = 0; i < dotPos1; i++) {
+				if (num1.num[i] > num2.num[i])
+					return true;
+				else if (num1.num[i] < num2.num[i])
+					return false;
+			}
+
+			int temp = (dotPos1 - num1.num.length() > dotPos2 - num2.num.length() ? dotPos1 - num1.num.length() : dotPos2 - num2.num.length());
+
+			for (int i = dotPos1; i < temp; i++) {
+				char a, b;
+				if (i > num1.num.length() - 1) {
+					a = '0';
+					b = num2.num[i];
+				}
+				else if (i > num2.num.length() - 1) {
+					a = num1.num[i];
+					b = '0';
+				}
+				else {
+					a = num1.num[i];
+					b = num2.num[i];
+				}
+
+				if (a > b)
+					return true;
+				else if (a < b)
+					return false;
+			}
+		}
+
+		return true;
+	}
+};
+
 class Processor {
 private: 
 	Processor* processor;
@@ -17,7 +109,7 @@ public:
 
 class Online : public Processor {
 private:
-	const float max = 10000000.00;// 10.000.000
+	const float max = 10000000.00;// 10,000,000
 public:
 	Online(Processor* processor) : Processor(processor) { }
 	~Online() {	}
