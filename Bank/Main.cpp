@@ -101,71 +101,71 @@ public:
 	}
 };
 
-class Processor {
+class Handler {
 private: 
-	Processor* processor;
+	Handler* handler;
 public:
-	Processor(Processor* processor) {
-		this->processor = processor;
+	Handler(Handler* handler) {
+		this->handler = handler;
 	}
 
 	virtual void process(Number* amount) {
-		if (this->processor != NULL)
-			this->processor->process(amount);
+		if (this->handler != NULL)
+			this->handler->process(amount);
 	}
 };
 
-class Online : public Processor {
+class Online : public Handler {
 private:
 	const Number* max = new Number("10000000.00"); // 10,000,000
 public:
-	Online(Processor* processor) : Processor(processor) { }
+	Online(Handler* handler) : Handler(handler) { }
 
 	~Online() {	}
 
 	void process(Number* amount) {
 		if (*amount <= *this->max)
-			cout << "Online Processor is processing this transfer ===> Money transfer" << endl;
+			cout << "Online Handler is processing this transfer ===> Money transfer" << endl;
 		else {
-			cout << "Online Processor can not process this transfer. Sending this request to Branch Processor ===> Request sent" << endl;
-			Processor::process(amount);
+			cout << "Online Handler can not process this transfer. Sending this request to Branch Handler ===> Request sent" << endl;
+			Handler::process(amount);
 		}
 	}
 };
 
-class Branch : public Processor {
+class Branch : public Handler {
 private:
 	const Number* max = new Number("1000000000.00"); // 1,000,000,000
 public:
-	Branch(Processor* processor) : Processor(processor) { }
+	Branch(Handler* handler) : Handler(handler) { }
 
 	~Branch() {	}
 
 	void process(Number* amount) {
 		if (*amount <= *this->max)
-			cout << "Branch Processor is processing this transfer ===> Money transfer" << endl;
+			cout << "Branch Handler is processing this transfer ===> Money transfer" << endl;
 		else {
-			cout << "Brank Processor can not process this transfer. Sending this request to Headquarter Processor ===> Request sent" << endl;
-			Processor::process(amount);
+			cout << "Brank Handler can not process this transfer. Sending this request to Headquarter Handler ===> Request sent" << endl;
+			Handler::process(amount);
 		}
 	}
 };
 
-class Headquarter : public Processor {
+class Headquarter : public Handler {
 
 public:
-	Headquarter(Processor* processor) : Processor(processor) { }
+	Headquarter(Handler* handler) : Handler(handler) { }
 
 	~Headquarter() { }
 
 	void process(Number* amount) {
-		cout << "Headquarter Processor is processing this transfer ===> Money transfer" << endl;
+		cout << "Headquarter Handler is processing this transfer ===> Money transfer" << endl;
 	}
 };
 
 class Chain {
 private:
-	Processor* chain;
+	Handler* chain;
 public:
 	Chain() {
 		this->chain = new Online(new Branch(new Headquarter(NULL)));
