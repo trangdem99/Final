@@ -33,7 +33,7 @@ public:
 			for (int i = 0; i < num.length(); i++) {
 				if (num[i] == '.')
 					if (dotFlag == 0)
-						dotFlag == 1;
+						dotFlag = 1;
 					else
 						return false;
 				else if (num[0] < '0' || num[0] > '9')
