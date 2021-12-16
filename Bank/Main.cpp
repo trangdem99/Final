@@ -9,22 +9,34 @@ public:
 	Number() {
 		this->num = "0.0";
 	}
+
 	~Number() { }
+
 	Number(string num) {
-		this->num = num;
+		this->num = (numCheck(num) == true ? numFormat(num) : "0.0");
 	}
 
-	bool numCheck() {
-		if ((this->num[0] >= '0' && this->num[0] <= '9') || this->num[0] == '-' || this->num[0] == '+' || this->num[0] == '.') {
-			int dotFlag = (this->num[0] == '.' ? 1 : 0);
+	string numFormat(string num) {
+		string result = "";
 
-			for (int i = 0; i < this->num.length(); i++) {
-				if (this->num[i] == '.')
+		for (int i = 0; i < num.length(); i++)
+			if ((result.length() == 0 && (num[i] != '0' || num[i] != '+')) || result.length() > 0)
+				result += num[i];
+
+		return result;
+	}
+
+	bool numCheck(string num) {
+		if ((num[0] >= '0' && num[0] <= '9') || num[0] == '+' || num[0] == '.') {
+			int dotFlag = (num[0] == '.' ? 1 : 0);
+
+			for (int i = 0; i < num.length(); i++) {
+				if (num[i] == '.')
 					if (dotFlag == 0)
 						dotFlag == 1;
 					else
 						return false;
-				else if (this->num[0] < '0' || this->num[0] > '9')
+				else if (num[0] < '0' || num[0] > '9')
 					return false;
 			}
 
@@ -34,60 +46,55 @@ public:
 		return false;
 	}
 
-	friend bool operator>=(const Number& num1, const Number& num2) {
-		if (num1.num[0] == '+' && num2.num[0] == '-')
-			return true;
-		else if (num1.num[0] == '-' && num2.num[0] == '+')
+	friend bool operator<=(const Number& num1, const Number& num2) {
+		int dotPos1 = 0, dotPos2 = 0;
+
+		for (int i = 0; i < num1.num.length(); i++)
+			if (num1.num[i] == '.') {
+				dotPos1 = i; 
+				break;
+			}
+
+		for (int i = 0; i < num2.num.length(); i++)
+			if (num2.num[i] == '.') {
+				dotPos2 = i;
+				break;
+			}
+
+		if (dotPos1 > dotPos2)
 			return false;
-		else {
-			int dotPos1 = 0, dotPos2 = 0;
-
-			for (int i = 0; i < num1.num.length(); i++)
-				if (num1.num[i] == '.') {
-					dotPos1 = i; 
-					break;
-				}
-
-			for (int i = 0; i < num2.num.length(); i++)
-				if (num2.num[i] == '.') {
-					dotPos2 = i;
-					break;
-				}
-
-			if (dotPos1 > dotPos2)
-				return true;
-			else if (dotPos1 < dotPos2)
-				return false;
+		else if (dotPos1 < dotPos2)
+			return true;
 			
-			for (int i = 0; i < dotPos1; i++) {
-				if (num1.num[i] > num2.num[i])
-					return true;
-				else if (num1.num[i] < num2.num[i])
-					return false;
+		for (int i = 0; i < dotPos1; i++) {
+			if (num1.num[i] > num2.num[i])
+				return false;
+			else if (num1.num[i] < num2.num[i])
+				return true;
+		}
+
+		int temp = (num1.num.length() - dotPos1 > num2.num.length() - dotPos2 ? num1.num.length() - dotPos1 : num2.num.length() - dotPos2);
+
+		for (int i = dotPos1; i < dotPos1 + temp; i++) {
+			char a, b;
+
+			if (i > num1.num.length() - 1) {
+				a = '0';
+				b = num2.num[i];
+			}
+			else if (i > num2.num.length() - 1) {
+				a = num1.num[i];
+				b = '0';
+			}
+			else {
+				a = num1.num[i];
+				b = num2.num[i];
 			}
 
-			int temp = (dotPos1 - num1.num.length() > dotPos2 - num2.num.length() ? dotPos1 - num1.num.length() : dotPos2 - num2.num.length());
-
-			for (int i = dotPos1; i < temp; i++) {
-				char a, b;
-				if (i > num1.num.length() - 1) {
-					a = '0';
-					b = num2.num[i];
-				}
-				else if (i > num2.num.length() - 1) {
-					a = num1.num[i];
-					b = '0';
-				}
-				else {
-					a = num1.num[i];
-					b = num2.num[i];
-				}
-
-				if (a > b)
-					return true;
-				else if (a < b)
-					return false;
-			}
+			if (a > b)
+				return false;
+			else if (a < b)
+				return true;
 		}
 
 		return true;
@@ -101,7 +108,8 @@ public:
 	Processor(Processor* processor) {
 		this->processor = processor;
 	}
-	virtual void process(float amount) {
+
+	virtual void process(Number* amount) {
 		if (this->processor != NULL)
 			this->processor->process(amount);
 	}
@@ -109,12 +117,14 @@ public:
 
 class Online : public Processor {
 private:
-	const float max = 10000000.00;// 10,000,000
+	const Number* max = new Number("10000000.00"); // 10,000,000
 public:
 	Online(Processor* processor) : Processor(processor) { }
+
 	~Online() {	}
-	void process(float amount) {
-		if (amount <= this->max)
+
+	void process(Number* amount) {
+		if (*amount <= *this->max)
 			cout << "Online Processor is processing this transfer ===> Money transfer" << endl;
 		else {
 			cout << "Online Processor can not process this transfer. Sending this request to Branch Processor ===> Request sent" << endl;
@@ -125,12 +135,14 @@ public:
 
 class Branch : public Processor {
 private:
-	const float max = 1000000000.00;// 1.000.000.000
+	const Number* max = new Number("1000000000.00"); // 1,000,000,000
 public:
 	Branch(Processor* processor) : Processor(processor) { }
+
 	~Branch() {	}
-	void process(float amount) {
-		if (amount <= this->max)
+
+	void process(Number* amount) {
+		if (*amount <= *this->max)
 			cout << "Branch Processor is processing this transfer ===> Money transfer" << endl;
 		else {
 			cout << "Brank Processor can not process this transfer. Sending this request to Headquarter Processor ===> Request sent" << endl;
@@ -140,16 +152,14 @@ public:
 };
 
 class Headquarter : public Processor {
-private:
-	const float min = 1000000000.00;// 1.000.000.000
+
 public:
 	Headquarter(Processor* processor) : Processor(processor) { }
+
 	~Headquarter() { }
-	void process(float amount) {
-		if (amount > this->min)
-			cout << "Headquarter Processor is processing this transfer ===> Money transfer" << endl;
-		else
-			cout << "Something went wrong here" << endl;
+
+	void process(Number* amount) {
+		cout << "Headquarter Processor is processing this transfer ===> Money transfer" << endl;
 	}
 };
 
@@ -163,7 +173,7 @@ public:
 	~Chain(){
 		delete[]chain;
 	}
-	void process(float amount) {
+	void process(Number* amount) {
 		this->chain->process(amount);
 	}
 };
@@ -171,7 +181,7 @@ public:
 int main() {
 	Chain* chain = new Chain();
 
-	chain->process(999999999.99);
+	chain->process(new Number("1000000000.00001"));
 
 	return 0;
 }
