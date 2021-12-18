@@ -4,7 +4,7 @@
 using namespace std;
 
 /* function PhepCong, PhepTru, PhepNhan coded by H.T.Nguyen*/
-string PhepCong(string s1, string s2, int dotPos) {
+string PhepCong(string s1, string s2) {
 	string temp = "", result = "";
 	int length1 = s1.length() - 1, length2 = s2.length() - 1;
 	int ultra = 0;
@@ -14,6 +14,8 @@ string PhepCong(string s1, string s2, int dotPos) {
 			temp += to_string(((s1[length1] - '0') + (s2[length2] - '0') + ultra) % 10);
 			ultra = ((s1[length1] - '0') + (s2[length2] - '0') + ultra) / 10;
 		}
+		else
+			temp += '.';
 		length1--, length2--;
 	}
 
@@ -22,30 +24,30 @@ string PhepCong(string s1, string s2, int dotPos) {
 			temp += to_string(((s1[length1] - '0') + ultra) % 10);
 			ultra = ((s1[length1] - '0') + ultra) / 10;
 		}
+		else
+			temp += '.';
 		length1--;
 	}
 
 	while (length2 >= 0) {
 		if (s2[length2] != '.') {
 			temp += to_string(((s2[length2] - '0') + ultra) % 10);
-			ultra = ((s1[length2] - '0') + ultra) / 10;
+			ultra = ((s2[length2] - '0') + ultra) / 10;
 		}
+		else
+			temp += '.';
 		length2--;
 	}
 
 	temp += (ultra != 0) ? to_string(ultra) : "";
 
-	for (int i = temp.length() - 1; i >= 0; i--) {
-		if (i == temp.length() - dotPos && dotPos != 0)
-			result += '.';
-
+	for (int i = temp.length() - 1; i >= 0; i--)
 		result += temp[i];
-	}
 
 	return result;
 }
 
-string PhepTru(string s1, string s2, int dotPos) {
+string PhepTru(string s1, string s2) {
 	string temp = "", result = "";
 	int length1 = s1.length() - 1, length2 = s2.length() - 1;
 	int ultra = 0;
@@ -55,6 +57,8 @@ string PhepTru(string s1, string s2, int dotPos) {
 			temp += to_string(((s1[length1] - '0') - (s2[length2] - '0') - ultra) < 0 ? (10 + (s1[length1] - '0') - (s2[length2] - '0') - ultra) : ((s1[length1] - '0') - (s2[length2] - '0') - ultra));
 			ultra = (((s1[length1] - '0') - (s2[length2] - '0') - ultra) < 0) ? 1 : 0;
 		}
+		else
+			temp += '.';
 		length1--, length2--;
 	}
 
@@ -63,6 +67,8 @@ string PhepTru(string s1, string s2, int dotPos) {
 			temp += to_string(((s1[length1] - '0') - ultra) < 0 ? (10 + (s1[length1] - '0') - ultra) : ((s1[length1] - '0') - ultra));
 			ultra = (((s1[length1] - '0') - ultra) < 0) ? 1 : 0;
 		}
+		else
+			temp += '.';
 		length1--;
 	}
 
@@ -71,6 +77,8 @@ string PhepTru(string s1, string s2, int dotPos) {
 			temp += to_string(((s2[length2] - '0') - ultra) < 0 ? (10 + (s2[length2] - '0') - ultra) : ((s2[length2] - '0') - ultra));
 			ultra = (((s2[length2] - '0') - ultra) < 0) ? 1 : 0;
 		}
+		else
+			temp += '.';
 		length2--;
 	}
 
@@ -79,9 +87,6 @@ string PhepTru(string s1, string s2, int dotPos) {
 	int flag = 0;
 
 	for (int i = temp.length() - 1; i >= 0; i--) {
-		if (i == temp.length() - dotPos && dotPos != 0)
-			result += '.';
-
 		if (flag == 1)
 			result += temp[i];
 		else if (temp[i] != '0') {
@@ -132,8 +137,8 @@ public:
 
 		if (result[0] == '.')
 			result = "0" + result;
-		else if (result.length() == 1 && result[0] != '.')
-			result = result + ".0";
+		else if ((result.length() == 1 && result[0] != '.') || (getDotPos(result) == result.length()))
+			result = result + ".00";
 
 		return result;
 	}
@@ -211,30 +216,23 @@ public:
 	}
 
 	void editBalance(Number* amount, string action) {
-		string fromNum = this->balance->getNum(), toNum = amount->getNum();
+		string main = this->balance->getNum(), num = amount->getNum();
 		
-		int dotPos1 = getDotPos(fromNum), dotPos2 = getDotPos(toNum);
-		int dotPos;
-		int length1 = fromNum.length(), length2 = toNum.length();
+		int dotPos1 = getDotPos(main), dotPos2 = getDotPos(num);
+		int length1 = main.length(), length2 = num.length();
 		
 		// 234.56 - 12.345 -> 234.560 - 12.345
-		if (length1 - dotPos1 > length2 - dotPos2) {
-			dotPos = fromNum.length() - dotPos1;
-
-			for (int i = 0; i < dotPos - (length2 - dotPos2); i++)
-				toNum += "0";
-		}
-		else {
-			dotPos = toNum.length() - dotPos2;
-
-			for (int i = 0; i < dotPos - (length1 - dotPos1); i++)
-				fromNum += "0";
-		}
+		if (length1 - dotPos1 > length2 - dotPos2)
+			for (int i = 0; i < (length1 - dotPos1) - (length2 - dotPos2); i++)
+				num += "0";
+		else
+			for (int i = 0; i < (length2 - dotPos2) - (length1 - dotPos1); i++)
+				main += "0";
 
 		if (action == "add")
-			this->balance->setNum(PhepCong(fromNum, toNum, dotPos));
+			this->balance->setNum(PhepCong(main, num));
 		else if (action == "subtract")
-			this->balance->setNum(PhepTru(fromNum, toNum, dotPos));
+			this->balance->setNum(PhepTru(main, num));
 	}
 	void showDetail() {
 		cout << "Id: " << this->id << ", Name: " << this->name << ", Amount: " << this->balance->getNum() << "." << endl;
@@ -349,9 +347,8 @@ int main() {
 		int Mode;
 		string temp = "0";
 
-		cout << "============DEMO PROGRAM FOR CHAIN OF RESPONSIBILITY============" << endl;
-		cout << endl << endl;
-		cout << "Transfer fund from BankAccount test1 to BankAccount test2" << endl;
+		cout << "============DEMO PROGRAM FOR CHAIN OF RESPONSIBILITY============" << endl << endl;
+		cout << "Transfer fund from BankAccount test1 to BankAccount test2" << endl << endl;
 		cout << "Bank account test 1: "; test1->showDetail();
 		cout << "Bank account test 2: "; test2->showDetail();
 		cout << endl;
