@@ -215,18 +215,19 @@ public:
 		
 		int dotPos1 = getDotPos(fromNum), dotPos2 = getDotPos(toNum);
 		int dotPos;
+		int length1 = fromNum.length(), length2 = toNum.length();
 		
 		// 234.56 - 12.345 -> 234.560 - 12.345
-		if (fromNum.length() - dotPos1 > toNum.length() - dotPos2) {
+		if (length1 - dotPos1 > length2 - dotPos2) {
 			dotPos = fromNum.length() - dotPos1;
 
-			for (int i = 0; i < toNum.length() - dotPos2 - dotPos; i++)
+			for (int i = 0; i < dotPos - (length2 - dotPos2); i++)
 				toNum += "0";
 		}
 		else {
 			dotPos = toNum.length() - dotPos2;
 
-			for (int i = 0; i < fromNum.length() - dotPos1 - dotPos; i++)
+			for (int i = 0; i < dotPos - (length1 - dotPos1); i++)
 				fromNum += "0";
 		}
 
