@@ -97,10 +97,8 @@ string PhepTru(string s1, string s2, int dotPos) {
 int getDotPos(string s) {
 	int result = 0;
 
-	for (int i = 0; i < s.length(); i++)
-		if (s[i] != '.')
-			result++;
-		else 
+	for (int i = 0; i < s.length(); i++, result++)
+		if (s[i] == '.')
 			break;
 
 	return result;
