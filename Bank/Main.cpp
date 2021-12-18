@@ -4,69 +4,107 @@
 using namespace std;
 
 /* function PhepCong, PhepTru, PhepNhan coded by H.T.Nguyen*/
-string PhepCong(string s1, string s2) {
+string PhepCong(string s1, string s2, int dotPos) {
 	string temp = "", result = "";
 	int length1 = s1.length() - 1, length2 = s2.length() - 1;
 	int ultra = 0;
 
 	while (length1 >= 0 && length2 >= 0) {
-		temp += to_string(((s1[length1] - '0') + (s2[length2] - '0') + ultra) % 10);
-		ultra = ((s1[length1] - '0') + (s2[length2] - '0') + ultra) / 10;
+		if (s1[length1] != '.' && s2[length2] != '.') {
+			temp += to_string(((s1[length1] - '0') + (s2[length2] - '0') + ultra) % 10);
+			ultra = ((s1[length1] - '0') + (s2[length2] - '0') + ultra) / 10;
+		}
 		length1--, length2--;
 	}
 
 	while (length1 >= 0) {
-		temp += to_string(((s1[length1] - '0') + ultra) % 10);
-		ultra = ((s1[length1] - '0') + ultra) / 10;
+		if (s1[length1] != '.') {
+			temp += to_string(((s1[length1] - '0') + ultra) % 10);
+			ultra = ((s1[length1] - '0') + ultra) / 10;
+		}
 		length1--;
 	}
 
 	while (length2 >= 0) {
-		temp += to_string(((s1[length2] - '0') + ultra) % 10);
-		ultra = ((s1[length2] - '0') + ultra) / 10;
+		if (s2[length2] != '.') {
+			temp += to_string(((s2[length2] - '0') + ultra) % 10);
+			ultra = ((s1[length2] - '0') + ultra) / 10;
+		}
 		length2--;
 	}
 
 	temp += (ultra != 0) ? to_string(ultra) : "";
 
-	for (int i = temp.length() - 1; i >= 0; i--)
+	for (int i = temp.length() - 1; i >= 0; i--) {
+		if (i == temp.length() - dotPos && dotPos != 0)
+			result += '.';
+
 		result += temp[i];
+	}
 
 	return result;
 }
 
-string PhepTru(string s1, string s2) {
+string PhepTru(string s1, string s2, int dotPos) {
 	string temp = "", result = "";
 	int length1 = s1.length() - 1, length2 = s2.length() - 1;
 	int ultra = 0;
 
 	while (length1 >= 0 && length2 >= 0) {
-		temp += to_string(((s1[length1] - '0') - (s2[length2] - '0') - ultra) < 0 ? (10 + (s1[length1] - '0') - (s2[length2] - '0') - ultra) : ((s1[length1] - '0') - (s2[length2] - '0') - ultra));
-		ultra = (((s1[length1] - '0') - (s2[length2] - '0') - ultra) < 0) ? 1 : 0;
+		if (s1[length1] != '.' && s2[length2] != '.') {
+			temp += to_string(((s1[length1] - '0') - (s2[length2] - '0') - ultra) < 0 ? (10 + (s1[length1] - '0') - (s2[length2] - '0') - ultra) : ((s1[length1] - '0') - (s2[length2] - '0') - ultra));
+			ultra = (((s1[length1] - '0') - (s2[length2] - '0') - ultra) < 0) ? 1 : 0;
+		}
 		length1--, length2--;
 	}
 
 	while (length1 >= 0) {
-		temp += to_string(((s1[length1] - '0') - ultra) < 0 ? (10 + (s1[length1] - '0') - ultra) : ((s1[length1] - '0') - ultra));
-		ultra = (((s1[length1] - '0') - ultra) < 0) ? 1 : 0;
+		if (s1[length1] != '.') {
+			temp += to_string(((s1[length1] - '0') - ultra) < 0 ? (10 + (s1[length1] - '0') - ultra) : ((s1[length1] - '0') - ultra));
+			ultra = (((s1[length1] - '0') - ultra) < 0) ? 1 : 0;
+		}
 		length1--;
 	}
 
 	while (length2 >= 0) {
-		temp += to_string(((s2[length2] - '0') - ultra) < 0 ? (10 + (s2[length2] - '0') - ultra) : ((s2[length2] - '0') - ultra));
-		ultra = (((s2[length2] - '0') - ultra) < 0) ? 1 : 0;
+		if (s2[length2] != '.') {
+			temp += to_string(((s2[length2] - '0') - ultra) < 0 ? (10 + (s2[length2] - '0') - ultra) : ((s2[length2] - '0') - ultra));
+			ultra = (((s2[length2] - '0') - ultra) < 0) ? 1 : 0;
+		}
 		length2--;
 	}
 
 	temp += (ultra == 1) ? to_string(ultra) : "";
-	temp += (ultra == 1 && s1.length() < s2.length()) ? "-" : "";
 
-	for (int i = temp.length() - 1; i >= 0; i--)
-		result += temp[i];
+	int flag = 0;
+
+	for (int i = temp.length() - 1; i >= 0; i--) {
+		if (i == temp.length() - dotPos && dotPos != 0)
+			result += '.';
+
+		if (flag == 1)
+			result += temp[i];
+		else if (temp[i] != '0') {
+			result += temp[i];
+			flag = 1;
+		}
+	}
+
+	return (flag == 0 ? "0.0" : result);
+}
+/* function PhepCong, PhepTru, PhepNhan coded by H.T.Nguyen*/
+
+int getDotPos(string s) {
+	int result = 0;
+
+	for (int i = 0; i < s.length(); i++)
+		if (s[i] != '.')
+			result++;
+		else 
+			break;
 
 	return result;
 }
-/* function PhepCong, PhepTru, PhepNhan coded by H.T.Nguyen*/
 
 class Number {
 private:
@@ -94,6 +132,11 @@ public:
 			if ((result.length() == 0 && (num[i] != '0' || num[i] != '+')) || result.length() > 0)
 				result += num[i];
 
+		if (result[0] == '.')
+			result = "0" + result;
+		else if (result.length() == 1 && result[0] != '.')
+			result = result + ".0";
+
 		return result;
 	}
 	
@@ -117,24 +160,7 @@ public:
 		return false;
 	}
 	friend bool operator<=(const Number& num1, const Number& num2) {
-		int dotPos1 = 0, dotPos2 = 0;
-
-		for (int i = 0; i < num1.num.length(); i++)
-			if (num1.num[i] == '.') {
-				dotPos1 = i; 
-				break;
-			}
-
-		for (int i = 0; i < num2.num.length(); i++)
-			if (num2.num[i] == '.') {
-				dotPos2 = i;
-				break;
-			}
-
-		if (dotPos1 == 0)
-			dotPos1 = num1.num.length();
-		if (dotPos2 == 0)
-			dotPos2 = num2.num.length();
+		int dotPos1 = getDotPos(num1.num), dotPos2 = getDotPos(num2.num);
 
 		if (dotPos1 > dotPos2)
 			return false;
@@ -186,11 +212,30 @@ public:
 		return this->balance;
 	}
 
-	void addBalance(Number* amount) {
-		this->balance->setNum(PhepCong(this->balance->getNum(), amount->getNum()));
-	}
-	void subtractBalance(Number* amount) {
-		this->balance->setNum(PhepTru(this->balance->getNum(), amount->getNum()));
+	void editBalance(Number* amount, string action) {
+		string fromNum = this->balance->getNum(), toNum = amount->getNum();
+		
+		int dotPos1 = getDotPos(fromNum), dotPos2 = getDotPos(toNum);
+		int dotPos;
+		
+		// 234.56 - 12.345 -> 234.560 - 12.345
+		if (fromNum.length() - dotPos1 > toNum.length() - dotPos2) {
+			dotPos = fromNum.length() - dotPos1;
+
+			for (int i = 0; i < toNum.length() - dotPos2 - dotPos; i++)
+				toNum += "0";
+		}
+		else {
+			dotPos = toNum.length() - dotPos2;
+
+			for (int i = 0; i < fromNum.length() - dotPos1 - dotPos; i++)
+				fromNum += "0";
+		}
+
+		if (action == "add")
+			this->balance->setNum(PhepCong(fromNum, toNum, dotPos));
+		else if (action == "subtract")
+			this->balance->setNum(PhepTru(fromNum, toNum, dotPos));
 	}
 	void showDetail() {
 		cout << "Id: " << this->id << ", Name: " << this->name << ", Amount: " << this->balance->getNum() << "." << endl;
@@ -221,8 +266,8 @@ public:
 
 	void process(BankAccount* fromAccount, BankAccount* toAccount, Number* amount) {
 		if (*amount <= *this->max) {
-			fromAccount->subtractBalance(amount);
-			toAccount->subtractBalance(amount);
+			fromAccount->editBalance(amount, "subtract");
+			toAccount->editBalance(amount, "add");
 			cout << "Online Handler is processing this transfer ===> Money transfer" << endl << endl << endl;
 			fromAccount->showDetail();
 			toAccount->showDetail();
@@ -243,8 +288,8 @@ public:
 
 	void process(BankAccount* fromAccount, BankAccount* toAccount, Number* amount) {
 		if (*amount <= *this->max) {
-			fromAccount->subtractBalance(amount);
-			toAccount->subtractBalance(amount);
+			fromAccount->editBalance(amount, "subtract");
+			toAccount->editBalance(amount, "add");
 			cout << "Branch Handler is processing this transfer ===> Money transfer" << endl << endl << endl;
 			fromAccount->showDetail();
 			toAccount->showDetail();
@@ -265,8 +310,8 @@ public:
 
 	void process(BankAccount* fromAccount, BankAccount* toAccount, Number* amount) {
 		if (*amount <= *this->max) {
-			fromAccount->subtractBalance(amount);
-			toAccount->subtractBalance(amount);
+			fromAccount->editBalance(amount, "subtract");
+			toAccount->editBalance(amount, "add");
 			cout << "Headquarter Handler is processing this transfer ===> Money transfer" << endl << endl << endl;
 			fromAccount->showDetail();
 			toAccount->showDetail();
@@ -298,7 +343,7 @@ public:
 int main() {
 	// Set up db
 	Chain* chain = new Chain();
-	BankAccount* test1 = new BankAccount("1", "Nguyen Van A", new Number("1000000000000"));
+	BankAccount* test1 = new BankAccount("1", "Nguyen Van A", new Number("234.56"));
 	BankAccount* test2 = new BankAccount("2", "Tran Thi B", new Number("0"));
 
 	while (true) {
@@ -317,7 +362,7 @@ int main() {
 		system("pause");
 		system("cls");
 
-		cout << "Do you want to transfer again? (Press 1 to continue, Press another to exit: "; cin >> Mode;
+		cout << "Do you want to transfer again? (Press 1 to continue, Press another to exit): "; cin >> Mode;
 		system("cls");
 
 		if (Mode != 1)
