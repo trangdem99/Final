@@ -145,7 +145,7 @@ public:
 	
 	bool numCheck(string num) {
 		if ((num[0] >= '0' && num[0] <= '9') || num[0] == '+' || num[0] == '.') {
-			int dotFlag = (num[0] == '.' ? 1 : 0);
+			int dotFlag = 0;
 
 			for (int i = 0; i < num.length(); i++) {
 				if (num[i] == '.')
