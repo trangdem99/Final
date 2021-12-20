@@ -135,6 +135,7 @@ public:
 			if ((result.length() == 0 && (num[i] != '0' || num[i] != '+')) || result.length() > 0)
 				result += num[i];
 
+		// .123 -> 0.123 and 12. -> 12.00
 		if (result[0] == '.')
 			result = "0" + result;
 		else if ((result.length() == 1 && result[0] != '.') || (getDotPos(result) == result.length()))
@@ -145,7 +146,7 @@ public:
 	
 	bool numCheck(string num) {
 		if ((num[0] >= '0' && num[0] <= '9') || num[0] == '+' || num[0] == '.') {
-			int dotFlag = (num[0] == '.' ? 1 : 0);
+			int dotFlag = 0;
 
 			for (int i = 0; i < num.length(); i++) {
 				if (num[i] == '.')
@@ -248,6 +249,7 @@ public:
 		this->handler = handler;
 	}
 
+	// Check if the chain of responsibility have handler or not 
 	virtual void process(BankAccount* fromAccount, BankAccount* toAccount, Number* amount) {
 		if (this->handler != NULL)
 			this->handler->process(fromAccount, toAccount, amount);
@@ -261,6 +263,7 @@ public:
 	Online(Handler* handler) : Handler(handler) { }
 	~Online() {	}
 
+	// Check responsibility then process if it is valid else go to next handler 
 	void process(BankAccount* fromAccount, BankAccount* toAccount, Number* amount) {
 		if (*amount <= *this->max) {
 			fromAccount->editBalance(amount, "subtract");
@@ -283,6 +286,7 @@ public:
 	Branch(Handler* handler) : Handler(handler) { }
 	~Branch() {	}
 
+	// Check responsibility then process if it is valid else go to next handler 
 	void process(BankAccount* fromAccount, BankAccount* toAccount, Number* amount) {
 		if (*amount <= *this->max) {
 			fromAccount->editBalance(amount, "subtract");
@@ -305,6 +309,7 @@ public:
 	Headquarter(Handler* handler) : Handler(handler) { }
 	~Headquarter() { }
 
+	// Check responsibility then process if it is valid else go to next handler 
 	void process(BankAccount* fromAccount, BankAccount* toAccount, Number* amount) {
 		if (*amount <= *this->max) {
 			fromAccount->editBalance(amount, "subtract");
@@ -328,7 +333,8 @@ public:
 	~Chain(){
 		delete[]chain;
 	}
-
+	
+	// create the request for chain of responsibilty
 	void process(BankAccount* fromAccount, BankAccount* toAccount, Number* amount) {
 		if (*amount <= *fromAccount->getBalance())
 			this->chain->process(fromAccount, toAccount, amount);
