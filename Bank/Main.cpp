@@ -117,8 +117,11 @@ public:
 		this->num = "0.0";
 	}
 	~Number() { }
-	Number(string num) {
-		this->num = (numCheck(num) == true ? numFormat(num) : "0.0");
+	Number(string num) : Number() {
+		if (numCheck(num) == true)
+			this->num = numFormat(num);
+		else
+			cout << "The input is not a number. Please try again" << endl;
 	}
 
 	void setNum(string num) {
@@ -336,17 +339,18 @@ public:
 	
 	// create the request for chain of responsibilty
 	void process(BankAccount* fromAccount, BankAccount* toAccount, Number* amount) {
-		if (*amount <= *fromAccount->getBalance())
-			this->chain->process(fromAccount, toAccount, amount);
-		else
-			cout << "Insufficient fund for this transfer. Plese reduce the amount or deposit more fund" << endl;
+		if (amount->getNum() != "0.0")
+			if (*amount <= *fromAccount->getBalance())
+				this->chain->process(fromAccount, toAccount, amount);
+			else
+				cout << "Insufficient fund for this transfer. Plese reduce the amount or deposit more fund" << endl;
 	}
 };
 
 int main() {
 	// Set up db
 	Chain* chain = new Chain();
-	BankAccount* test1 = new BankAccount("1", "Nguyen Van A", new Number("234.56"));
+	BankAccount* test1 = new BankAccount("1", "Nguyen Van A", new Number("100000000000"));
 	BankAccount* test2 = new BankAccount("2", "Tran Thi B", new Number("0"));
 
 	while (true) {
@@ -354,7 +358,7 @@ int main() {
 		string temp = "0";
 
 		cout << "============DEMO PROGRAM FOR CHAIN OF RESPONSIBILITY============" << endl << endl;
-		cout << "Transfer fund from BankAccount test1 to BankAccount test2" << endl << endl;
+		cout << "Transfer fund from BankAccount \"test1\" to BankAccount \"test2\"" << endl << endl;
 		cout << "Bank account test 1: "; test1->showDetail();
 		cout << "Bank account test 2: "; test2->showDetail();
 		cout << endl;
